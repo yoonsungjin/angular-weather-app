@@ -107,5 +107,8 @@
       }
     }
   },
-  "defaultProject": "weather-forecast"
+  "defaultProject": "weather-forecast",
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
+  }
 }
