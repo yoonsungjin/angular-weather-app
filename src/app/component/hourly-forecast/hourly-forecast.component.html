@@ -1,9 +1,7 @@
 <div>
-  <div>
-    <button class="btn" (click)="getHourlyForecast()">Hourly</button>
-  </div>
   <div class="timeline">
     <h1>3-hour Forecast</h1>
+    <div>{{ cityName }}</div>
     <div *ngFor="let item of timeline">
       <div>{{ item.time | date:'H:mm' }}</div>
       <div>{{ item.temp | number:'1.0-0'}}°F</div>

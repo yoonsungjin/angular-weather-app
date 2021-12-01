@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { loadHourlyForecast, loadDailyForecast, search } from '../store/weather.actions';
-import { getHouryForecast, getDailyForecast } from '../store/weather.selectors';
+import { getHouryForecast, getDailyForecast, getCoords } from '../store/weather.selectors';
+import { WeatherData } from './weather.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,5 +32,9 @@ export class WeatherFacadeService {
 
   public getDailyForecast(): Observable<any>{
     return this.store.select(getDailyForecast);
+  }
+
+  public getCoords(): Observable<WeatherData>{
+    return this.store.select(getCoords);
   }
 }

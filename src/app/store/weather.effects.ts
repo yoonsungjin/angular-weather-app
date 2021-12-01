@@ -3,7 +3,7 @@ import { WeatherService } from './../service/weather.service';
 import * as WeatherActions from './weather.actions';
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { concatMap, map, mergeMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { getCoords } from './weather.selectors';
 import { Store } from '@ngrx/store';
 import { WeatherData } from '../service/weather.model';
@@ -18,24 +18,21 @@ export class WeatherEffects {
   ) {}
 
   searchByCityName$ = createEffect(() =>this.actions$.pipe(
-      ofType(WeatherActions.search),
-      tap((action) => console.log('search effect fired', action)),
-      switchMap(action => this.weatherService.getWeatherDataByCityName(action.cityName)
-        .pipe(
-          map(data => {
-            return WeatherActions.searchSuccess({weatherData: data})
-          })
-        )
+    ofType(WeatherActions.search),
+    switchMap(action => this.weatherService.getWeatherDataByCityName(action.cityName)
+      .pipe(
+        map(data => {
+          return WeatherActions.searchSuccess({weatherData: data[0]})
+        })
       )
     )
-  );
+  ));
 
   loadHourlyForecast$ = createEffect(() => this.actions$.pipe(
     ofType(WeatherActions.loadHourlyForecast),
     withLatestFrom(this.store.select(getCoords)),
-    switchMap(([action, weatherData]: [any, WeatherData]) => this.weatherService.getHourlyWeatherData(weatherData).pipe(
+    concatMap(([action, weatherData]: [any, WeatherData]) => this.weatherService.getHourlyWeatherData(weatherData).pipe(
       map(data => {
-        console.log(data);
         return WeatherActions.loadHourlyForecastSuccess({data})
       })
     ))
@@ -43,11 +40,11 @@ export class WeatherEffects {
 
   loadDailyForecast$ = createEffect(() => this.actions$.pipe(
     ofType(WeatherActions.loadDailyForecast),
-    tap(() => console.log('loadDailyForecast effect fired')),
-    switchMap(() => this.weatherService.getDailyWeatherData({ lat: '43.7001', lon: '-79.4163' }).pipe(
-      map(dailyData => WeatherActions.loadDailyForecastSuccess({dailyData}))
+    withLatestFrom(this.store.select(getCoords)),
+    concatMap(([action, weatherData]: [any, WeatherData]) => this.weatherService.getDailyWeatherData(weatherData).pipe(
+      map(data => {
+        return WeatherActions.loadDailyForecastSuccess({dailyData: data})
+      })
     ))
   ));
-
-
 }
